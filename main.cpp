@@ -17,7 +17,7 @@ int main()
 	printf("Please enter the name of trace file : ");
 	scanf("%s",input);
 	
-	printf("%6s%6s%6s%18s\n", "size", "miss", "hit", "page fault ratio");
+	printf("%10s%10s%10s%18s\n", "size", "miss", "hit", "page fault ratio");
 	int i;
 	for(i=0; i<4; i++)
 	{
@@ -37,8 +37,8 @@ int main()
 			address >>= 12;								//4KB
 			if(table.count(address))					//hit
 			{
-				table[address]->frequency++;
 				int temp = table[address]->frequency;
+				temp++;
 				d.frequency = temp;
 				d.address = address;
 				list<data>::iterator it = table[address];
@@ -46,17 +46,22 @@ int main()
 				{
 					if (it == page.end())
 						break;
-					else if(temp > it->frequency)
+					else if(temp > (it->frequency))
 						it++;
 					else
 						break;
 				}
+				--it;
 				if(it != table[address])				//change
 				{
+					it++;
 					page.erase(table[address]);
 					page.insert(it, d);
+					it--;
 					table[address] = it;
 				}
+				else
+					it->frequency = temp;
 				hit++;
 			}
 			else										//miss
@@ -70,10 +75,10 @@ int main()
 				d.frequency = 1;				
 				page.push_front(d);						//the least used
 				table[address] = page.begin();	
-				miss++;			
+				miss++;		
 			}
 		}	
-		printf("%6d%6d%6d%18.10lf\n", frame_size[i], miss, hit, miss / (double) (hit + miss));		
+		printf("%10d%10d%10d%18.10lf\n", frame_size[i], miss, hit, miss / (double) (hit + miss));		
 		fclose(trace);
 	}
 	return 0;
